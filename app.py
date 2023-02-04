@@ -2,15 +2,15 @@ from flask import Flask, render_template, url_for
 from flask import request, redirect
 from werkzeug.utils import secure_filename
 import sqlite3
-import boto3
+#import boto3
 
 app = Flask(__name__)
 
-conn = sqlite3.connect('database.db')
+conn = sqlite3.connect('/var/www/html/flaskapp/database.db')
 conn.execute('drop table user')
 conn.execute('CREATE TABLE IF NOT EXISTS user (username TEXT, password TEXT, email EMAIL, first_name TEXT, last_name TEXT, link TEXT)');
 
-app.config['S3_BUCKET'] = "storage-bucket-gr"
+app.config['S3_BUCKET'] = ""
 app.config['S3_KEY'] = ""
 app.config['S3_SECRET'] = ""
 app.config['S3_LOCATION'] = 'http://{}.s3.us-east-2.amazonaws.com/'.format(app.config['S3_BUCKET'])
@@ -24,7 +24,7 @@ def login():
     username = request.form['username']
     password = request.form['password']
 
-    with sqlite3.connect("database.db") as con:
+    with sqlite3.connect("/var/www/html/flaskapp/database.db") as con:
         cur = con.cursor()
         cur.execute("SELECT * FROM user WHERE username = ? AND password = ?",(username,password))
         result = cur.fetchone()
@@ -42,7 +42,7 @@ def register():
             fname = request.form['fname']
             lname = request.form['lname']
             
-            with sqlite3.connect("database.db") as con:
+            with sqlite3.connect("/var/www/html/flaskapp/database.db") as con:
                 cur = con.cursor()
                 cur.execute("INSERT INTO user (username,password,email,first_name,last_name, link) VALUES (?,?,?,?,?,?)",(username,password,email,fname,lname, ''))
                 con.commit()
